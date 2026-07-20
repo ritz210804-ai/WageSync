@@ -124,6 +124,14 @@
         let localShiftsBackup = []; 
         let currentSelectedLang = 'en-IN'; // Default speech standard locale
 
+        // Pre-trigger voice library download buffer for background engine stability
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.getVoices();
+            window.speechSynthesis.onvoiceschanged = () => {
+                window.speechSynthesis.getVoices();
+            };
+        }
+
         function handleWorkerPunch() {
             const actionBtn = document.getElementById('btn-punch-action');
             const statusTxt = document.getElementById('punch-status-text');
@@ -185,7 +193,6 @@
             });
         }
 
-        // Multilingual Interactive Local AI Assistant & Voice Navigation Panel
         function openSubScreen(type) {
             const box = document.getElementById('app-sub-screen');
             const inner = document.getElementById('sub-screen-content');
@@ -222,7 +229,6 @@
                         </div>
                     </div>
                 `;
-                // Retain selected dropdown choice across UI refreshes
                 document.getElementById('lang-selector').value = currentSelectedLang;
             } else if(type === 'sms-logs') {
                 inner.innerHTML = `
@@ -239,7 +245,6 @@
             currentSelectedLang = val;
         }
 
-        // Speech Input Capability Logic (Listens to Mic Stream)
         function startVoiceRecognition() {
             const micBtn = document.getElementById('btn-mic');
             const aiInput = document.getElementById('ai-input');
@@ -251,7 +256,7 @@
             }
 
             const recognition = new SpeechRecognition();
-            recognition.lang = currentSelectedLang; // Dynamic locale injection matching dropdown choice
+            recognition.lang = currentSelectedLang; 
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
             
@@ -279,7 +284,7 @@
             recognition.start();
         }
 
-        // 5-LANGUAGE INTELLIGENT RULE ENGINE WITH SEPARATE CHAT TIMELINE DISPLAY
+        // 5-LANGUAGE UPGRADED INTEL ENGINE WITH HARDWARE-VOICE SELECTION BINDING LOGIC
         function processAiQuestion() {
             const inputField = document.getElementById('ai-input');
             const chatBox = document.getElementById('ai-chat-box');
@@ -319,11 +324,10 @@
                 'te-IN': {
                     wage: "వేజ్‌సింక్ డేటాబేస్ రికార్డ్ తనిఖీ విజయవంతమైంది: మీ ప్రామాణిక వేతన రేటు ప్రతి షిఫ్ట్‌కు ఏడు వందల ఇరవై రూపాయలుగా ధృవీకరించబడింది.",
                     shift: "మీ షిఫ్ట్ వివరాలు సురక్షితంగా ఉన్నాయి. మీ జిపిఎస్ లొకేషన్ బొమ్మసంద్ర ఇండస్ట్రియల్ ఏరియాతో సరిపోలింది.",
-                    fallback: "దయచేసి జీతం, డబ్బులు లేదా షిఫ్ట్ వంటి పదాలను ఉపయోగించి మరోసారి అడగండి."
+                    fallback: "コツ దయచేసి జీతం, డబ్బులు లేదా షిఫ్ట్ వంటి పదాలను ఉపయోగించి మరోసారి అడగండి."
                 }
             };
 
-            // Detect matching cluster types across languages
             let currentDataset = responsesMap[currentSelectedLang] || responsesMap['en-IN'];
             let chosenTextResponse = currentDataset.fallback;
 
@@ -336,7 +340,7 @@
             const isShiftQuery = lowerQuery.includes('overtime') || lowerQuery.includes('ot') || lowerQuery.includes('shift') || 
                                 lowerQuery.includes('attendance') || lowerQuery.includes('hours') || lowerQuery.includes('check') || 
                                 lowerQuery.includes('punch') || lowerQuery.includes('ಹಾಜರಾತಿ') || lowerQuery.includes('حضور') || 
-                                lowerQuery.includes('வருகை') || lowerQuery.includes('హాజరు');
+                                lowerQuery.includes('வருகை') || lowerQuery.includes('ಹಾಜರು') || lowerQuery.includes('షెడ్యూల్');
 
             if (isWageQuery) {
                 chosenTextResponse = currentDataset.wage;
@@ -344,32 +348,39 @@
                 chosenTextResponse = currentDataset.shift;
             }
 
-            // Append AI Answer message block directly inside our new Chat timeline row box
+            // Append AI Answer message block directly inside our Chat timeline row box
             setTimeout(() => {
                 const aiMsgNode = document.createElement('div');
                 aiMsgNode.className = "bg-purple-950/40 border border-purple-900/50 text-purple-200 rounded-lg p-2 text-[10px] leading-relaxed self-start max-w-[85%] font-medium";
                 aiMsgNode.innerText = chosenTextResponse;
                 chatBox.appendChild(aiMsgNode);
                 
-                // Auto-scroll timeline to display the new content instantly
                 chatBox.scrollTop = chatBox.scrollHeight;
 
-                // Execute Speech Synthesizer Out Loud Audio Track Flow
+                // FIXED SPEECH UTTERANCE PREFERENCE ACCENT LOOP BINDING
                 if ('speechSynthesis' in window) {
                     window.speechSynthesis.cancel(); 
                     const utterance = new SpeechSynthesisUtterance(chosenTextResponse);
                     
-                    // Match voice synthesis locale language codes cleanly to engine selections
-                    if (currentSelectedLang === 'kn-IN') utterance.lang = 'kn-IN';
-                    else if (currentSelectedLang === 'hi-IN') utterance.lang = 'hi-IN';
-                    else if (currentSelectedLang === 'ta-IN') utterance.lang = 'ta-IN';
-                    else if (currentSelectedLang === 'te-IN') utterance.lang = 'te-IN';
-                    else utterance.lang = 'en-IN';
+                    // Assign exact language code directly
+                    utterance.lang = currentSelectedLang;
 
-                    utterance.rate = 0.92; // Deliberate pace for maximum auditory clarity
+                    // FORCE CRITICAL SCAN: Look for system voice packs matching the chosen language prefix ('hi', 'kn', 'ta', 'te')
+                    const targetPrefix = currentSelectedLang.split('-')[0];
+                    const voices = window.speechSynthesis.getVoices();
+                    const matchedSystemVoice = voices.find(v => v.lang.toLowerCase().startsWith(targetPrefix));
+                    
+                    if (matchedSystemVoice) {
+                        utterance.voice = matchedSystemVoice;
+                        console.log("Forced system translation accent lock:", matchedSystemVoice.name);
+                    } else {
+                        console.warn("No local accent match found for target code prefix:", targetPrefix, ". Using browser default engine.");
+                    }
+
+                    utterance.rate = 0.90; 
                     window.speechSynthesis.speak(utterance);
                 }
-            }, 350);
+            }, 300);
 
             inputField.value = "";
         }
