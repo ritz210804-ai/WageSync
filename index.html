@@ -11,11 +11,13 @@
 
     <header class="bg-slate-950 border-b border-slate-800 px-6 py-4 flex flex-wrap justify-between items-center shadow-lg gap-4">
         <div>
-            <div class="flex items-center gap-2">
-                <span class="p-2 bg-blue-600 rounded-lg text-white font-black text-sm shadow-md">WS</span>
-                <h1 class="text-2xl font-black bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">WageSync</h1>
+            <div class="flex items-center gap-3">
+                <img src="logo.jpg" alt="WageSync Logo" class="w-10 h-10 rounded-full object-cover border border-slate-700 shadow-md bg-white">
+                <div>
+                    <h1 class="text-2xl font-black bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent leading-none">WageSync</h1>
+                    <p class="text-[10px] text-slate-400 mt-1 font-medium tracking-wide">Targeted Digital Intervention for Industrial Belts (Bommasandra, Anekal) | SDG 8</p>
+                </div>
             </div>
-            <p class="text-xs text-slate-400 mt-0.5 font-medium tracking-wide">Targeted Digital Intervention for Industrial Belts (Bommasandra, Anekal) | SDG 8</p>
         </div>
         <div class="flex items-center gap-3">
             <span class="bg-emerald-950/80 border border-emerald-800 text-emerald-400 font-bold px-3 py-1.5 rounded-full text-xs flex items-center gap-1">
@@ -122,9 +124,8 @@
         let isPunchedIn = false;
         let smsLogStorage = [];
         let localShiftsBackup = []; 
-        let currentSelectedLang = 'en-IN'; // Default speech standard locale
+        let currentSelectedLang = 'en-IN';
 
-        // Pre-trigger voice library download buffer for background engine stability
         if ('speechSynthesis' in window) {
             window.speechSynthesis.getVoices();
             window.speechSynthesis.onvoiceschanged = () => {
@@ -284,7 +285,6 @@
             recognition.start();
         }
 
-        // 5-LANGUAGE UPGRADED INTEL ENGINE WITH HARDWARE-VOICE SELECTION BINDING LOGIC
         function processAiQuestion() {
             const inputField = document.getElementById('ai-input');
             const chatBox = document.getElementById('ai-chat-box');
@@ -293,13 +293,11 @@
             
             if (queryText === "") return;
 
-            // Append User Question to the Chat Box timeline immediately
             const userMsgNode = document.createElement('div');
             userMsgNode.className = "bg-slate-800 border border-slate-700 text-slate-100 rounded-lg p-2 text-[10px] leading-relaxed self-end max-w-[85%] text-right font-medium";
             userMsgNode.innerText = queryText;
             chatBox.appendChild(userMsgNode);
 
-            // Multilingual Response Localization Library Data Object Mapping
             const responsesMap = {
                 'en-IN': {
                     wage: "WageSync database record check successful: Your standard profile rate is verified at seven hundred and twenty rupees per shift.",
@@ -308,12 +306,12 @@
                 },
                 'kn-IN': {
                     wage: "ವೇಜ್‌ಸಿಂಕ್ ದಾಖಲೆ ಪರಿಶೀಲನೆ ಯಶಸ್ವಿಯಾಗಿದೆ: ನಿಮ್ಮ ಪ್ರಮಾಣಿತ ವೇತನ ದರವನ್ನು ಪ್ರತಿ ಶಿಫ್ಟ್‌ಗೆ ಏಳು ನೂರು ಇಪ್ಪತ್ತು ರೂಪಾಯಿಗಳು ಎಂದು ದೃಢೀಕರಿಸಲಾಗಿದೆ.",
-                    shift: "ನಿಮ್ಮ ಶಿಫ್ಟ್ ವಿವರಗಳು ಸುರಕ್ಷಿತವಾಗಿವೆ. ನಿಮ್ಮ ಜಿಪಿಎಸ್ ಸ್ಥಳವು ಬೊಮ್ಮಸಂದ್ರ ಕೈಗಾರಿಕಾ ವಲಯದೊಂದಿಗೆ ಹೊಂದಾಣಿಕೆಯಾಗಿದೆ.",
+                    shift: "ನಿಮ್ಮ ಶಿఫ್ಟ್ ವಿವರಗಳು ಸುರಕ್ಷಿತವಾಗಿವೆ. ನಿಮ್ಮ ಜಿಪಿಎಸ್ ಸ್ಥಳವು ಬೊಮ್ಮಸಂದ್ರ ಕೈಗಾರಿಕಾ ವಲಯದೊಂದಿಗೆ ಹೊಂದಾಣಿಕೆಯಾಗಿದೆ.",
                     fallback: "ದಯವಿಟ್ಟು ಸಂಬಳ, ದುಡ್ಡು, ಅಥವಾ ಶಿಫ್ಟ್ ಎಂಬ ಪದಗಳನ್ನು ಬಳಸಿ ಮತ್ತೊಮ್ಮೆ ಕೇಳಿ."
                 },
                 'hi-IN': {
                     wage: "वेजसिंक डेटाबेस रिकॉर्ड जांच सफल रही: आपकी मानक वेतन दर प्रति शिफ्ट सात सौ बीस रुपये निर्धारित की गई है।",
-                    shift: "आपके शिफ्ट पैरामीटर सुरक्षित हैं। आपकी जीपीएस लोकेशन बोम्मासन्द्रा इंडस्ट्रियल यूनिट से पूरी तरह मेल खाती है।",
+                    shift: "आपके शिफ्ट पैरामीटर सुरक्षित हैं। आपकी जीपीएस लोकेशन बोम्मासन्द्रा मुख्य यूनिट से पूरी तरह मेल खाती है।",
                     fallback: "कृपया वेतन, पैसे, या शिफ्ट जैसे विशिष्ट शब्दों का उपयोग करके फिर से पूछें।"
                 },
                 'ta-IN': {
@@ -324,7 +322,7 @@
                 'te-IN': {
                     wage: "వేజ్‌సింక్ డేటాబేస్ రికార్డ్ తనిఖీ విజయవంతమైంది: మీ ప్రామాణిక వేతన రేటు ప్రతి షిఫ్ట్‌కు ఏడు వందల ఇరవై రూపాయలుగా ధృవీకరించబడింది.",
                     shift: "మీ షిఫ్ట్ వివరాలు సురక్షితంగా ఉన్నాయి. మీ జిపిఎస్ లొకేషన్ బొమ్మసంద్ర ఇండస్ట్రియల్ ఏరియాతో సరిపోలింది.",
-                    fallback: "コツ దయచేసి జీతం, డబ్బులు లేదా షిఫ్ట్ వంటి పదాలను ఉపయోగించి మరోసారి అడగండి."
+                    fallback: "దయచేసి జీతం, డబ్బులు లేదా షిఫ్ట్ వంటి పదాలను ఉపయోగించి మరోసారి అడగండి."
                 }
             };
 
@@ -340,7 +338,7 @@
             const isShiftQuery = lowerQuery.includes('overtime') || lowerQuery.includes('ot') || lowerQuery.includes('shift') || 
                                 lowerQuery.includes('attendance') || lowerQuery.includes('hours') || lowerQuery.includes('check') || 
                                 lowerQuery.includes('punch') || lowerQuery.includes('ಹಾಜರಾತಿ') || lowerQuery.includes('حضور') || 
-                                lowerQuery.includes('வருகை') || lowerQuery.includes('ಹಾಜರು') || lowerQuery.includes('షెడ్యూల్');
+                                lowerQuery.includes('வருகை') || lowerQuery.includes('ಹಾಜరు') || lowerQuery.includes('షెడ్యూల్');
 
             if (isWageQuery) {
                 chosenTextResponse = currentDataset.wage;
@@ -348,7 +346,6 @@
                 chosenTextResponse = currentDataset.shift;
             }
 
-            // Append AI Answer message block directly inside our Chat timeline row box
             setTimeout(() => {
                 const aiMsgNode = document.createElement('div');
                 aiMsgNode.className = "bg-purple-950/40 border border-purple-900/50 text-purple-200 rounded-lg p-2 text-[10px] leading-relaxed self-start max-w-[85%] font-medium";
@@ -357,24 +354,18 @@
                 
                 chatBox.scrollTop = chatBox.scrollHeight;
 
-                // FIXED SPEECH UTTERANCE PREFERENCE ACCENT LOOP BINDING
                 if ('speechSynthesis' in window) {
                     window.speechSynthesis.cancel(); 
-                    const utterance = new SpeechSynthesisUtterance(chosenTextResponse);
+                    const utterance = new SynthesisUtterance || new SpeechSynthesisUtterance(chosenTextResponse);
                     
-                    // Assign exact language code directly
                     utterance.lang = currentSelectedLang;
 
-                    // FORCE CRITICAL SCAN: Look for system voice packs matching the chosen language prefix ('hi', 'kn', 'ta', 'te')
                     const targetPrefix = currentSelectedLang.split('-')[0];
                     const voices = window.speechSynthesis.getVoices();
                     const matchedSystemVoice = voices.find(v => v.lang.toLowerCase().startsWith(targetPrefix));
                     
                     if (matchedSystemVoice) {
                         utterance.voice = matchedSystemVoice;
-                        console.log("Forced system translation accent lock:", matchedSystemVoice.name);
-                    } else {
-                        console.warn("No local accent match found for target code prefix:", targetPrefix, ". Using browser default engine.");
                     }
 
                     utterance.rate = 0.90; 
