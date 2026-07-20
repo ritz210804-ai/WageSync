@@ -132,7 +132,6 @@
             if (!isPunchedIn) {
                 actionBtn.innerText = "Transmitting...";
                 
-                // Generate secure random text reference ID mapping variables
                 let generatedId = "shf_" + Math.random().toString(36).substring(2, 10);
                 
                 let shiftData = {
@@ -153,7 +152,6 @@
             } else {
                 actionBtn.innerText = "Syncing...";
                 
-                // Finalize active tracking item status state markers
                 if(localShiftsBackup.length > 0) {
                     localShiftsBackup[0].status = 'Completed';
                 }
@@ -190,7 +188,7 @@
             });
         }
 
-        // Multilingual Interactive Local AI Assistant Simulation Functions
+        // Multilingual Interactive Local AI Assistant & Voice Navigation Panel
         function openSubScreen(type) {
             const box = document.getElementById('app-sub-screen');
             const inner = document.getElementById('sub-screen-content');
@@ -199,12 +197,17 @@
             if(type === 'ai-assistant') {
                 inner.innerHTML = `
                     <div class="flex flex-col h-full justify-between space-y-2">
-                        <p class="font-bold text-purple-950 text-[11px] uppercase flex items-center gap-1"><i data-lucide="bot" class="w-3.5 h-3.5"></i> AI Assistant Engine</p>
-                        <div class="bg-slate-100 p-2 rounded text-[11px] border border-slate-200 font-medium text-slate-800">
-                            "Hello! Ask me about your attendance history, shift tracking data, or minimum wage transparency validations."
+                        <p class="font-bold text-purple-950 text-[11px] uppercase flex items-center gap-1">
+                            <i data-lucide="bot" class="w-3.5 h-3.5"></i> AI Voice Assistant Engine
+                        </p>
+                        <div id="ai-response-bubble" class="bg-slate-100 p-2 rounded text-[11px] border border-slate-200 font-medium text-slate-800">
+                            "Hello! Tap the microphone to speak, or type your question about your wages or attendance."
                         </div>
                         <div class="flex gap-1">
-                            <input id="ai-input" type="text" placeholder="Type question (Kannada / Hindi)..." class="border border-slate-300 rounded px-2 py-1 flex-1 text-[11px] focus:outline-none">
+                            <input id="ai-input" type="text" placeholder="Type or speak (wage/overtime)..." class="border border-slate-300 rounded px-2 py-1 flex-1 text-[11px] focus:outline-none">
+                            <button id="btn-mic" onclick="startVoiceRecognition()" class="bg-purple-100 text-purple-700 hover:bg-purple-200 p-1.5 rounded flex items-center justify-center transition">
+                                <i data-lucide="mic" class="w-3.5 h-3.5"></i>
+                            </button>
                             <button onclick="processAiQuestion()" class="bg-purple-600 text-white px-3 py-1 rounded text-[11px] font-bold">Ask</button>
                         </div>
                     </div>
@@ -220,21 +223,69 @@
             lucide.createIcons();
         }
 
+        // Speech Input Capability Logic (Listens to Mic Stream)
+        function startVoiceRecognition() {
+            const micBtn = document.getElementById('btn-mic');
+            const aiInput = document.getElementById('ai-input');
+            
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("Voice recognition is not supported on this browser context. Please test using Google Chrome.");
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-IN'; // Optimized for standard regional accents
+            
+            recognition.onstart = () => {
+                micBtn.className = "bg-red-500 text-white p-1.5 rounded flex items-center justify-center animate-pulse";
+                aiInput.placeholder = "Listening now...";
+            };
+
+            recognition.onresult = (event) => {
+                const speechToText = event.results[0][0].transcript;
+                aiInput.value = speechToText;
+                processAiQuestion(); // Execute processing logic upon recording receipt
+            };
+
+            recognition.onend = () => {
+                micBtn.className = "bg-purple-100 text-purple-700 hover:bg-purple-200 p-1.5 rounded flex items-center justify-center transition";
+                aiInput.placeholder = "Type or speak (wage/overtime)...";
+            };
+
+            recognition.start();
+        }
+
+        // Text Analysis & Audio Synthesis Logic (Talks Out Loud)
         function processAiQuestion() {
-            const input = document.getElementById('ai-input').value.toLowerCase();
+            const inputField = document.getElementById('ai-input');
+            const responseBubble = document.getElementById('ai-response-bubble');
+            const input = inputField.value.toLowerCase();
+            
             let response = "I couldn't locate specific record coordinates matching that query. Please request assistance using keyword variations.";
             
             if(input.includes('wage') || input.includes('pay') || input.includes('ದುಡ್ಡು')) {
-                response = "WageSync database record check successful: Your daily standard profile rate is structured at legal compliance margins (₹720.00 / shift).";
+                response = "WageSync database record check successful: Your daily standard profile rate is structured at standard legal compliance margins. Seven hundred and twenty rupees per shift.";
             } else if(input.includes('overtime') || input.includes('ot')) {
                 response = "Overtime parameters indicate automated compliance queuing. Shifts logs verify tracking matches active parameters.";
             }
 
-            alert(`[WageSync Voice AI Engine]\n\n${response}`);
-            document.getElementById('ai-input').value = "";
+            // Repopulate text fields inside bubble UI elements
+            responseBubble.innerText = `"${response}"`;
+            responseBubble.className = "bg-purple-50 text-purple-950 p-2 rounded text-[11px] border border-purple-200 font-semibold";
+            
+            // Audio Speech Synthesis Datalink Channel
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Flush lingering speaker components array streams
+                const utterance = new SpeechSynthesisUtterance(response);
+                utterance.rate = 0.95; 
+                window.speechSynthesis.speak(utterance);
+            }
+
+            inputField.value = "";
         }
 
-        // Initialize display configuration layout elements
+        // Run primary layout initializations
         renderLedgerDashboard();
         lucide.createIcons();
     </script>
