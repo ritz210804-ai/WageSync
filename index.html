@@ -19,7 +19,7 @@
         </div>
         <div class="flex items-center gap-3">
             <span class="bg-emerald-950/80 border border-emerald-800 text-emerald-400 font-bold px-3 py-1.5 rounded-full text-xs flex items-center gap-1">
-                <i data-lucide="globe" class="w-3.5 h-3.5 animate-pulse"></i> High-Fidelity Presentation Node Active
+                <i data-lucide="globe" class="w-3.5 h-3.5 animate-pulse"></i> High-Fidelity 5-Language Node Active
             </span>
         </div>
     </header>
@@ -56,7 +56,7 @@
                             </div>
                         </div>
 
-                        <div class="p-4 space-y-3 flex-grow">
+                        <div class="p-4 space-y-3 flex-grow flex flex-col justify-start">
                             <div class="grid grid-cols-2 gap-2">
                                 <button onclick="openSubScreen('ai-assistant')" class="p-3 bg-white border border-slate-200 rounded-xl text-left hover:border-purple-400 transition shadow-sm">
                                     <div class="p-2 bg-purple-100 text-purple-600 rounded-lg w-fit mb-1.5"><i data-lucide="bot-message-square" class="w-4 h-4"></i></div>
@@ -68,7 +68,7 @@
                                 </button>
                             </div>
 
-                            <div id="app-sub-screen" class="hidden bg-white border border-slate-200 rounded-xl p-3 shadow-inner min-h-[180px] flex flex-col justify-between">
+                            <div id="app-sub-screen" class="hidden bg-white border border-slate-200 rounded-xl p-3 shadow-inner flex flex-col justify-between space-y-2">
                                 <div id="sub-screen-content" class="text-xs text-slate-700 flex-1"></div>
                             </div>
                         </div>
@@ -111,7 +111,7 @@
                             </tr>
                         </thead>
                         <tbody id="portal-ledger-rows" class="divide-y divide-slate-800 text-slate-300">
-                            </tbody>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -122,8 +122,8 @@
         let isPunchedIn = false;
         let smsLogStorage = [];
         let localShiftsBackup = []; 
+        let currentSelectedLang = 'en-IN'; // Default speech standard locale
 
-        // Interactive Punch In/Out Execution Flow
         function handleWorkerPunch() {
             const actionBtn = document.getElementById('btn-punch-action');
             const statusTxt = document.getElementById('punch-status-text');
@@ -131,7 +131,6 @@
 
             if (!isPunchedIn) {
                 actionBtn.innerText = "Transmitting...";
-                
                 let generatedId = "shf_" + Math.random().toString(36).substring(2, 10);
                 
                 let shiftData = {
@@ -151,7 +150,6 @@
                 isPunchedIn = true;
             } else {
                 actionBtn.innerText = "Syncing...";
-                
                 if(localShiftsBackup.length > 0) {
                     localShiftsBackup[0].status = 'Completed';
                 }
@@ -169,7 +167,6 @@
             lucide.createIcons();
         }
 
-        // Render logs onto dashboard view layout layers
         function renderLedgerDashboard() {
             const targetRows = document.getElementById('portal-ledger-rows');
             document.getElementById('active-workers-metric').innerText = `${localShiftsBackup.length} System Records`;
@@ -197,25 +194,40 @@
             if(type === 'ai-assistant') {
                 inner.innerHTML = `
                     <div class="flex flex-col h-full justify-between space-y-2">
-                        <p class="font-bold text-purple-950 text-[11px] uppercase flex items-center gap-1">
-                            <i data-lucide="bot" class="w-3.5 h-3.5"></i> AI Voice Assistant Engine
-                        </p>
-                        <div id="ai-response-bubble" class="bg-slate-100 p-2 rounded text-[11px] border border-slate-200 font-medium text-slate-800">
-                            "Hello! Tap the microphone to speak, or type your question about your wages or attendance."
+                        <div class="flex justify-between items-center border-b border-slate-200 pb-1.5">
+                            <p class="font-bold text-purple-950 text-[11px] uppercase flex items-center gap-1">
+                                <i data-lucide="bot" class="w-3.5 h-3.5"></i> AI Voice Engine
+                            </p>
+                            <select id="lang-selector" onchange="updateSelectedLanguage(this.value)" class="text-[10px] font-bold bg-purple-50 border border-purple-200 text-purple-700 rounded px-1 py-0.5 focus:outline-none">
+                                <option value="en-IN">English (IN)</option>
+                                <option value="kn-IN">ಕನ್ನಡ (Kannada)</option>
+                                <option value="hi-IN">हिन्दी (Hindi)</option>
+                                <option value="ta-IN">தமிழ் (Tamil)</option>
+                                <option value="te-IN">తెలుగు (Telugu)</option>
+                            </select>
                         </div>
-                        <div class="flex gap-1">
-                            <input id="ai-input" type="text" placeholder="Type or speak (wage/overtime)..." class="border border-slate-300 rounded px-2 py-1 flex-1 text-[11px] focus:outline-none text-slate-900 font-medium">
-                            <button id="btn-mic" onclick="startVoiceRecognition()" class="bg-purple-100 text-purple-700 hover:bg-purple-200 p-1.5 rounded flex items-center justify-center transition">
+
+                        <div id="ai-chat-box" class="bg-slate-900 rounded-xl p-2.5 max-h-[140px] min-h-[110px] overflow-y-auto space-y-2 flex flex-col">
+                            <div class="bg-purple-950/40 border border-purple-900/50 text-purple-200 rounded-lg p-2 text-[10px] leading-relaxed self-start max-w-[85%]">
+                                Hello! Select your preferred language above. Tap the microphone icon to speak, or type your question down below.
+                            </div>
+                        </div>
+
+                        <div class="flex gap-1 pt-1">
+                            <input id="ai-input" type="text" placeholder="Ask about wages or shifts..." class="border border-slate-300 rounded-lg px-2 py-1 flex-1 text-[11px] focus:outline-none text-slate-900 font-medium">
+                            <button id="btn-mic" onclick="startVoiceRecognition()" class="bg-purple-100 text-purple-700 hover:bg-purple-200 p-2 rounded-lg flex items-center justify-center transition">
                                 <i data-lucide="mic" class="w-3.5 h-3.5"></i>
                             </button>
-                            <button onclick="processAiQuestion()" class="bg-purple-600 text-white px-3 py-1 rounded text-[11px] font-bold hover:bg-purple-700 transition">Ask</button>
+                            <button onclick="processAiQuestion()" class="bg-purple-600 text-white px-3 py-1 rounded-lg text-[11px] font-bold hover:bg-purple-700 transition">Ask</button>
                         </div>
                     </div>
                 `;
+                // Retain selected dropdown choice across UI refreshes
+                document.getElementById('lang-selector').value = currentSelectedLang;
             } else if(type === 'sms-logs') {
                 inner.innerHTML = `
                     <p class="font-bold text-amber-950 text-[11px] uppercase mb-2 flex items-center gap-1"><i data-lucide="smartphone" class="w-3.5 h-3.5"></i> SMS Notification Ledger Logs</p>
-                    <div class="space-y-1.5 max-h-[120px] overflow-y-auto">
+                    <div class="space-y-1.5 max-h-[140px] overflow-y-auto">
                         ${smsLogStorage.length === 0 ? '<p class="text-slate-400 italic font-medium">No messages synchronized yet.</p>' : smsLogStorage.map(log => `<div class="bg-slate-950 text-emerald-400 p-2 rounded text-[10px] font-mono leading-normal shadow-sm border border-slate-800">${log}</div>`).join('')}
                     </div>
                 `;
@@ -223,87 +235,145 @@
             lucide.createIcons();
         }
 
+        function updateSelectedLanguage(val) {
+            currentSelectedLang = val;
+        }
+
         // Speech Input Capability Logic (Listens to Mic Stream)
         function startVoiceRecognition() {
             const micBtn = document.getElementById('btn-mic');
             const aiInput = document.getElementById('ai-input');
             
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
             if (!SpeechRecognition) {
-                alert("Voice recognition is not supported on this browser context. Please test using Google Chrome.");
+                alert("Voice recognition is not supported on this browser window context. Please present using Google Chrome.");
                 return;
             }
 
             const recognition = new SpeechRecognition();
-            recognition.lang = 'en-IN'; // Optimized for standard regional accents
+            recognition.lang = currentSelectedLang; // Dynamic locale injection matching dropdown choice
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
             
             recognition.onstart = () => {
-                micBtn.className = "bg-red-500 text-white p-1.5 rounded flex items-center justify-center animate-pulse";
-                aiInput.placeholder = "Listening now...";
+                micBtn.className = "bg-red-500 text-white p-2 rounded-lg flex items-center justify-center animate-pulse";
+                aiInput.placeholder = "Listening text stream live...";
             };
 
             recognition.onresult = (event) => {
                 const speechToText = event.results[0][0].transcript;
                 aiInput.value = speechToText;
-                processAiQuestion(); // Execute processing logic upon recording receipt
+                processAiQuestion(); 
+            };
+
+            recognition.onerror = (e) => {
+                console.error("Audio stream block details:", e);
+                micBtn.className = "bg-purple-100 text-purple-700 p-2 rounded-lg";
             };
 
             recognition.onend = () => {
-                micBtn.className = "bg-purple-100 text-purple-700 hover:bg-purple-200 p-1.5 rounded flex items-center justify-center transition";
-                aiInput.placeholder = "Type or speak (wage/overtime)...";
+                micBtn.className = "bg-purple-100 text-purple-700 hover:bg-purple-200 p-2 rounded-lg flex items-center justify-center transition";
+                aiInput.placeholder = "Ask about wages or shifts...";
             };
 
             recognition.start();
         }
 
-        // UPGRADED FOOLPROOF AI ENGINE (Analyzes keywords & Talks Out Loud)
+        // 5-LANGUAGE INTELLIGENT RULE ENGINE WITH SEPARATE CHAT TIMELINE DISPLAY
         function processAiQuestion() {
             const inputField = document.getElementById('ai-input');
-            const responseBubble = document.getElementById('ai-response-bubble');
-            const input = inputField.value.toLowerCase().trim();
+            const chatBox = document.getElementById('ai-chat-box');
+            const queryText = inputField.value.trim();
+            const lowerQuery = queryText.toLowerCase();
             
-            // Empty question safety fallback
-            if (input === "") {
-                let hint = "Please say or type a question, such as 'What is my wage?' or 'Check my shift status'.";
-                responseBubble.innerText = `"${hint}"`;
-                if ('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel();
-                    window.speechSynthesis.speak(new SpeechSynthesisUtterance(hint));
+            if (queryText === "") return;
+
+            // Append User Question to the Chat Box timeline immediately
+            const userMsgNode = document.createElement('div');
+            userMsgNode.className = "bg-slate-800 border border-slate-700 text-slate-100 rounded-lg p-2 text-[10px] leading-relaxed self-end max-w-[85%] text-right font-medium";
+            userMsgNode.innerText = queryText;
+            chatBox.appendChild(userMsgNode);
+
+            // Multilingual Response Localization Library Data Object Mapping
+            const responsesMap = {
+                'en-IN': {
+                    wage: "WageSync database record check successful: Your standard profile rate is verified at seven hundred and twenty rupees per shift.",
+                    shift: "Shift parameters indicate automated compliance queuing. Your geo-location telemetry tags match active worksite coordinates perfectly.",
+                    fallback: "Query analyzed. Please request assistance using explicit keyword variables like wage, pay, or shift log status codes."
+                },
+                'kn-IN': {
+                    wage: "ವೇಜ್‌ಸಿಂಕ್ ದಾಖಲೆ ಪರಿಶೀಲನೆ ಯಶಸ್ವಿಯಾಗಿದೆ: ನಿಮ್ಮ ಪ್ರಮಾಣಿತ ವೇತನ ದರವನ್ನು ಪ್ರತಿ ಶಿಫ್ಟ್‌ಗೆ ಏಳು ನೂರು ಇಪ್ಪತ್ತು ರೂಪಾಯಿಗಳು ಎಂದು ದೃಢೀಕರಿಸಲಾಗಿದೆ.",
+                    shift: "ನಿಮ್ಮ ಶಿಫ್ಟ್ ವಿವರಗಳು ಸುರಕ್ಷಿತವಾಗಿವೆ. ನಿಮ್ಮ ಜಿಪಿಎಸ್ ಸ್ಥಳವು ಬೊಮ್ಮಸಂದ್ರ ಕೈಗಾರಿಕಾ ವಲಯದೊಂದಿಗೆ ಹೊಂದಾಣಿಕೆಯಾಗಿದೆ.",
+                    fallback: "ದಯವಿಟ್ಟು ಸಂಬಳ, ದುಡ್ಡು, ಅಥವಾ ಶಿಫ್ಟ್ ಎಂಬ ಪದಗಳನ್ನು ಬಳಸಿ ಮತ್ತೊಮ್ಮೆ ಕೇಳಿ."
+                },
+                'hi-IN': {
+                    wage: "वेजसिंक डेटाबेस रिकॉर्ड जांच सफल रही: आपकी मानक वेतन दर प्रति शिफ्ट सात सौ बीस रुपये निर्धारित की गई है।",
+                    shift: "आपके शिफ्ट पैरामीटर सुरक्षित हैं। आपकी जीपीएस लोकेशन बोम्मासन्द्रा इंडस्ट्रियल यूनिट से पूरी तरह मेल खाती है।",
+                    fallback: "कृपया वेतन, पैसे, या शिफ्ट जैसे विशिष्ट शब्दों का उपयोग करके फिर से पूछें।"
+                },
+                'ta-IN': {
+                    wage: "வேஜ்சின்க் தரவுத்தள சரிபார்ப்பு வெற்றிகரமாக முடிந்தது: உங்கள் நிலையான ஊதிய விகிதம் ஒரு ஷிப்ட்டிற்கு எழுநூற்று இருபது ரூபாய் என உறுதிப்படுத்தப்பட்டுள்ளது.",
+                    shift: "உங்கள் ஷிப்ட் விவரங்கள் பாதுகாப்பாக உள்ளன. உங்கள் ஜிபிஎஸ் இருப்பிடம் தொழிற்சாலை குறியீட்டுடன் ஒத்துப்போகிறது.",
+                    fallback: "தயவுசெய்து சம்பளம், பணம் அல்லது ஷிப்ட் போன்ற சொற்களைப் பயன்படுத்தி மீண்டும் கேட்கவும்."
+                },
+                'te-IN': {
+                    wage: "వేజ్‌సింక్ డేటాబేస్ రికార్డ్ తనిఖీ విజయవంతమైంది: మీ ప్రామాణిక వేతన రేటు ప్రతి షిఫ్ట్‌కు ఏడు వందల ఇరవై రూపాయలుగా ధృవీకరించబడింది.",
+                    shift: "మీ షిఫ్ట్ వివరాలు సురక్షితంగా ఉన్నాయి. మీ జిపిఎస్ లొకేషన్ బొమ్మసంద్ర ఇండస్ట్రియల్ ఏరియాతో సరిపోలింది.",
+                    fallback: "దయచేసి జీతం, డబ్బులు లేదా షిఫ్ట్ వంటి పదాలను ఉపయోగించి మరోసారి అడగండి."
                 }
-                return;
-            }
-            
-            let response = "I couldn't locate specific record coordinates matching that query. Please request assistance using keyword variations.";
-            
-            // Broadened wage/money/pay matchers
-            if(input.includes('wage') || input.includes('pay') || input.includes('salary') || input.includes('money') || input.includes('earnings') || input.includes('rupees') || input.includes('ದುಡ್ಡು') || input.includes('ಸಂಬಳ')) {
-                response = "WageSync database record check successful: Your active standard profile rate is structurally anchored at legal compliance margins. It is verified at seven hundred and twenty rupees per shift.";
-            } 
-            // Broadened tracking/overtime/attendance matchers
-            else if(input.includes('overtime') || input.includes('ot') || input.includes('shift') || input.includes('attendance') || input.includes('hours') || input.includes('check') || input.includes('punch') || input.includes('ಹಾಜರಾತಿ')) {
-                response = "Shift parameters indicate automated compliance queuing. Your geo-location telemetry tags match active worksite parameters perfectly, and your shift log is locked against tampering.";
-            }
-            // Catch-all safety net for greetings
-            else if(input.includes('hello') || input.includes('hi') || input.includes('hey') || input.includes('help')) {
-                response = "Hello! I am your automated WageSync companion. You can ask me to verify your daily shift earnings rates or check your transparent labor audit history.";
+            };
+
+            // Detect matching cluster types across languages
+            let currentDataset = responsesMap[currentSelectedLang] || responsesMap['en-IN'];
+            let chosenTextResponse = currentDataset.fallback;
+
+            const isWageQuery = lowerQuery.includes('wage') || lowerQuery.includes('pay') || lowerQuery.includes('salary') || 
+                               lowerQuery.includes('money') || lowerQuery.includes('earnings') || lowerQuery.includes('rupees') || 
+                               lowerQuery.includes('ದುಡ್ಡು') || lowerQuery.includes('ಸಂಬಳ') || lowerQuery.includes('वेतन') || 
+                               lowerQuery.includes('पैसे') || lowerQuery.includes('சம்பளம்') || lowerQuery.includes('பணம்') || 
+                               lowerQuery.includes('జీతం') || lowerQuery.includes('డబ్బు');
+
+            const isShiftQuery = lowerQuery.includes('overtime') || lowerQuery.includes('ot') || lowerQuery.includes('shift') || 
+                                lowerQuery.includes('attendance') || lowerQuery.includes('hours') || lowerQuery.includes('check') || 
+                                lowerQuery.includes('punch') || lowerQuery.includes('ಹಾಜರಾತಿ') || lowerQuery.includes('حضور') || 
+                                lowerQuery.includes('வருகை') || lowerQuery.includes('హాజరు');
+
+            if (isWageQuery) {
+                chosenTextResponse = currentDataset.wage;
+            } else if (isShiftQuery) {
+                chosenTextResponse = currentDataset.shift;
             }
 
-            // Update UI Bubble text styling dynamically
-            responseBubble.innerText = `"${response}"`;
-            responseBubble.className = "bg-purple-50 text-purple-950 p-2 rounded text-[11px] border border-purple-200 font-semibold shadow-sm";
-            
-            // Audio Speech Synthesis Datalink Channel
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); // Flush lingering speaker components array streams
-                const utterance = new SpeechSynthesisUtterance(response);
-                utterance.rate = 0.95; 
-                window.speechSynthesis.speak(utterance);
-            }
+            // Append AI Answer message block directly inside our new Chat timeline row box
+            setTimeout(() => {
+                const aiMsgNode = document.createElement('div');
+                aiMsgNode.className = "bg-purple-950/40 border border-purple-900/50 text-purple-200 rounded-lg p-2 text-[10px] leading-relaxed self-start max-w-[85%] font-medium";
+                aiMsgNode.innerText = chosenTextResponse;
+                chatBox.appendChild(aiMsgNode);
+                
+                // Auto-scroll timeline to display the new content instantly
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                // Execute Speech Synthesizer Out Loud Audio Track Flow
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel(); 
+                    const utterance = new SpeechSynthesisUtterance(chosenTextResponse);
+                    
+                    // Match voice synthesis locale language codes cleanly to engine selections
+                    if (currentSelectedLang === 'kn-IN') utterance.lang = 'kn-IN';
+                    else if (currentSelectedLang === 'hi-IN') utterance.lang = 'hi-IN';
+                    else if (currentSelectedLang === 'ta-IN') utterance.lang = 'ta-IN';
+                    else if (currentSelectedLang === 'te-IN') utterance.lang = 'te-IN';
+                    else utterance.lang = 'en-IN';
+
+                    utterance.rate = 0.92; // Deliberate pace for maximum auditory clarity
+                    window.speechSynthesis.speak(utterance);
+                }
+            }, 350);
 
             inputField.value = "";
         }
 
-        // Run primary layout initializations
         renderLedgerDashboard();
         lucide.createIcons();
     </script>
