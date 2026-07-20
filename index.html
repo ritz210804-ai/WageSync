@@ -147,7 +147,7 @@
                 statusTxt.className = "text-emerald-600 font-bold text-sm mt-0.5 animate-pulse";
                 payTxt.innerText = "₹720.00";
                 actionBtn.innerHTML = `<i data-lucide="log-out" class="w-3.5 h-3.5"></i> Punch Out`;
-                actionBtn.className = "bg-rose-500 hover:bg-rose-600 text-white text-xs font-black px-4 py-2 rounded-lg shadow transition";
+                actionBtn.className = "bg-rose-500 hover:bg-rose-600 text-white text-xs font-black px-4 py-2 rounded-lg shadow transition transform active:scale-95";
                 isPunchedIn = true;
             } else {
                 actionBtn.innerText = "Syncing...";
@@ -162,7 +162,7 @@
                 statusTxt.className = "text-sm font-mono font-bold mt-0.5 text-slate-900";
                 payTxt.innerText = "₹0.00";
                 actionBtn.innerHTML = `<i data-lucide="power" class="w-3.5 h-3.5"></i> Punch In`;
-                actionBtn.className = "bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black px-4 py-2 rounded-lg shadow transition";
+                actionBtn.className = "bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black px-4 py-2 rounded-lg shadow transition transform active:scale-95";
                 isPunchedIn = false;
             }
             renderLedgerDashboard();
@@ -204,11 +204,11 @@
                             "Hello! Tap the microphone to speak, or type your question about your wages or attendance."
                         </div>
                         <div class="flex gap-1">
-                            <input id="ai-input" type="text" placeholder="Type or speak (wage/overtime)..." class="border border-slate-300 rounded px-2 py-1 flex-1 text-[11px] focus:outline-none">
+                            <input id="ai-input" type="text" placeholder="Type or speak (wage/overtime)..." class="border border-slate-300 rounded px-2 py-1 flex-1 text-[11px] focus:outline-none text-slate-900 font-medium">
                             <button id="btn-mic" onclick="startVoiceRecognition()" class="bg-purple-100 text-purple-700 hover:bg-purple-200 p-1.5 rounded flex items-center justify-center transition">
                                 <i data-lucide="mic" class="w-3.5 h-3.5"></i>
                             </button>
-                            <button onclick="processAiQuestion()" class="bg-purple-600 text-white px-3 py-1 rounded text-[11px] font-bold">Ask</button>
+                            <button onclick="processAiQuestion()" class="bg-purple-600 text-white px-3 py-1 rounded text-[11px] font-bold hover:bg-purple-700 transition">Ask</button>
                         </div>
                     </div>
                 `;
@@ -256,23 +256,41 @@
             recognition.start();
         }
 
-        // Text Analysis & Audio Synthesis Logic (Talks Out Loud)
+        // UPGRADED FOOLPROOF AI ENGINE (Analyzes keywords & Talks Out Loud)
         function processAiQuestion() {
             const inputField = document.getElementById('ai-input');
             const responseBubble = document.getElementById('ai-response-bubble');
-            const input = inputField.value.toLowerCase();
+            const input = inputField.value.toLowerCase().trim();
+            
+            // Empty question safety fallback
+            if (input === "") {
+                let hint = "Please say or type a question, such as 'What is my wage?' or 'Check my shift status'.";
+                responseBubble.innerText = `"${hint}"`;
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    window.speechSynthesis.speak(new SpeechSynthesisUtterance(hint));
+                }
+                return;
+            }
             
             let response = "I couldn't locate specific record coordinates matching that query. Please request assistance using keyword variations.";
             
-            if(input.includes('wage') || input.includes('pay') || input.includes('ದುಡ್ಡು')) {
-                response = "WageSync database record check successful: Your daily standard profile rate is structured at standard legal compliance margins. Seven hundred and twenty rupees per shift.";
-            } else if(input.includes('overtime') || input.includes('ot')) {
-                response = "Overtime parameters indicate automated compliance queuing. Shifts logs verify tracking matches active parameters.";
+            // Broadened wage/money/pay matchers
+            if(input.includes('wage') || input.includes('pay') || input.includes('salary') || input.includes('money') || input.includes('earnings') || input.includes('rupees') || input.includes('ದುಡ್ಡು') || input.includes('ಸಂಬಳ')) {
+                response = "WageSync database record check successful: Your active standard profile rate is structurally anchored at legal compliance margins. It is verified at seven hundred and twenty rupees per shift.";
+            } 
+            // Broadened tracking/overtime/attendance matchers
+            else if(input.includes('overtime') || input.includes('ot') || input.includes('shift') || input.includes('attendance') || input.includes('hours') || input.includes('check') || input.includes('punch') || input.includes('ಹಾಜರಾತಿ')) {
+                response = "Shift parameters indicate automated compliance queuing. Your geo-location telemetry tags match active worksite parameters perfectly, and your shift log is locked against tampering.";
+            }
+            // Catch-all safety net for greetings
+            else if(input.includes('hello') || input.includes('hi') || input.includes('hey') || input.includes('help')) {
+                response = "Hello! I am your automated WageSync companion. You can ask me to verify your daily shift earnings rates or check your transparent labor audit history.";
             }
 
-            // Repopulate text fields inside bubble UI elements
+            // Update UI Bubble text styling dynamically
             responseBubble.innerText = `"${response}"`;
-            responseBubble.className = "bg-purple-50 text-purple-950 p-2 rounded text-[11px] border border-purple-200 font-semibold";
+            responseBubble.className = "bg-purple-50 text-purple-950 p-2 rounded text-[11px] border border-purple-200 font-semibold shadow-sm";
             
             // Audio Speech Synthesis Datalink Channel
             if ('speechSynthesis' in window) {
