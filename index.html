@@ -12,7 +12,7 @@
     <header class="bg-slate-950 border-b border-slate-800 px-6 py-4 flex flex-wrap justify-between items-center shadow-lg gap-4">
         <div>
             <div class="flex items-center gap-3">
-                <img src="groupicon.jpg" alt="WageSync Logo" class="w-10 h-10 rounded-full object-cover border border-slate-700 shadow-md bg-white">
+                <img src="groupicon.jpg" onerror="this.src='logo.jpg'" alt="WageSync Logo" class="w-10 h-10 rounded-full object-cover border border-slate-700 shadow-md bg-white">
                 <div>
                     <h1 class="text-2xl font-black bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent leading-none">WageSync</h1>
                     <p class="text-[10px] text-slate-400 mt-1 font-medium tracking-wide">Targeted Digital Intervention for Industrial Belts (Bommasandra, Anekal) | SDG 8</p>
@@ -20,6 +20,9 @@
             </div>
         </div>
         <div class="flex items-center gap-3">
+            <button onclick="toggleQrModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-full text-xs flex items-center gap-1.5 shadow transition active:scale-95">
+                <i data-lucide="qr-code" class="w-3.5 h-3.5"></i> Scan Mobile App
+            </button>
             <span class="bg-emerald-950/80 border border-emerald-800 text-emerald-400 font-bold px-3 py-1.5 rounded-full text-xs flex items-center gap-1">
                 <i data-lucide="globe" class="w-3.5 h-3.5 animate-pulse"></i> Intelligent Language Detection Active
             </span>
@@ -120,6 +123,23 @@
         </section>
     </main>
 
+    <div id="qr-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl relative">
+            <h3 class="text-lg font-black text-slate-100 mb-1">Scan Worker App</h3>
+            <p class="text-xs text-slate-400 mb-4">Open this URL on any mobile device camera to test the live worker interface.</p>
+            
+            <div class="bg-white p-4 rounded-2xl inline-block shadow-inner mb-4">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://stimulating-wage-sync-flow.base44.app/" alt="WageSync QR Code" class="w-48 h-48 mx-auto">
+            </div>
+            
+            <p class="text-[11px] font-mono text-emerald-400 font-semibold mb-4">https://stimulating-wage-sync-flow.base44.app/</p>
+            
+            <button onclick="toggleQrModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2 rounded-xl text-xs transition">
+                Close Window
+            </button>
+        </div>
+    </div>
+
     <script>
         let isPunchedIn = false;
         let smsLogStorage = [];
@@ -130,6 +150,11 @@
             window.speechSynthesis.onvoiceschanged = () => {
                 window.speechSynthesis.getVoices();
             };
+        }
+
+        function toggleQrModal() {
+            const modal = document.getElementById('qr-modal');
+            modal.classList.toggle('hidden');
         }
 
         function handleWorkerPunch() {
@@ -154,7 +179,7 @@
                 statusTxt.className = "text-emerald-600 font-bold text-sm mt-0.5 animate-pulse";
                 payTxt.innerText = "₹720.00";
                 actionBtn.innerHTML = `<i data-lucide="log-out" class="w-3.5 h-3.5"></i> Punch Out`;
-                actionBtn.className = "bg-rose-500 hover:bg-rose-600 text-white text-xs font-black px-4 py-2 rounded-lg shadow transition transform active:scale-95";
+                actionBtn.className = "bg-rose-500 hover:bg-rose-600 text-white text-xs font-black px-4 py-2 rounded-lg shadow transition transform active:scale-95 flex items-center gap-1.5";
                 isPunchedIn = true;
             } else {
                 actionBtn.innerText = "Syncing...";
@@ -168,7 +193,7 @@
                 statusTxt.className = "text-sm font-mono font-bold mt-0.5 text-slate-900";
                 payTxt.innerText = "₹0.00";
                 actionBtn.innerHTML = `<i data-lucide="power" class="w-3.5 h-3.5"></i> Punch In`;
-                actionBtn.className = "bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black px-4 py-2 rounded-lg shadow transition transform active:scale-95";
+                actionBtn.className = "bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black px-4 py-2 rounded-lg shadow transition transform active:scale-95 flex items-center gap-1.5";
                 isPunchedIn = false;
             }
             renderLedgerDashboard();
@@ -226,7 +251,7 @@
                 inner.innerHTML = `
                     <p class="font-bold text-amber-950 text-[11px] uppercase mb-2 flex items-center gap-1"><i data-lucide="smartphone" class="w-3.5 h-3.5"></i> SMS Notification Ledger Logs</p>
                     <div class="space-y-1.5 max-h-[140px] overflow-y-auto">
-                        \${smsLogStorage.length === 0 ? '<p class="text-slate-400 italic font-medium">No messages synchronized yet.</p>' : smsLogStorage.map(log => `<div class="bg-slate-950 text-emerald-400 p-2 rounded text-[10px] font-mono leading-normal shadow-sm border border-slate-800">\${log}</div>`).join('')}
+                        ${smsLogStorage.length === 0 ? '<p class="text-slate-400 italic font-medium">No messages synchronized yet.</p>' : smsLogStorage.map(log => `<div class="bg-slate-950 text-emerald-400 p-2 rounded text-[10px] font-mono leading-normal shadow-sm border border-slate-800">${log}</div>`).join('')}
                     </div>
                 `;
             }
@@ -315,7 +340,7 @@
                 'kn-IN': {
                     wage: "ವೇಜ್‌ಸಿಂಕ್ ದಾಖಲೆ ಪರಿಶೀಲನೆ ಯಶಸ್ವಿಯಾಗಿದೆ: ನಿಮ್ಮ ಪ್ರಮಾಣಿತ ವೇತನ ದರವನ್ನು ಪ್ರತಿ ಶಿಫ್ಟ್‌ಗೆ ಏಳು ನೂರು ಇಪ್ಪತ್ತು ರೂಪಾಯಿಗಳು ಎಂದು ದೃಢೀಕರಿಸಲಾಗಿದೆ.",
                     shift: "ನಿಮ್ಮ ಶಿಫ್ಟ್ ವಿವರಗಳು ಸುರಕ್ಷಿತವಾಗಿವೆ. ನಿಮ್ಮ ಜಿಪಿಎಸ್ ಸ್ಥಳವು ಬೊಮ್ಮಸಂದ್ರ ಕೈಗಾರಿಕಾ ವಲಯದೊಂದಿಗೆ ಹೊಂದಾಣಿಕೆಯಾಗಿದೆ.",
-                    fallback: "ನಿಮ್ಮ ಪ್ರಶ್ನೆ ಅರ್ಥವಾಗಿದೆ. ದಯವಿಟ್ಟು ಸಂಬಳ, ದುಡ್ಡು, ಅಥವಾ ಶಿಫ್ಟ್ ಎಂಬ ಪದಗಳನ್ನು ಬಳसी ಮತ್ತೊಮ್ಮೆ ಕೇಳಿ."
+                    fallback: "ನಿಮ್ಮ ಪ್ರಶ್ನೆ ಅರ್ಥವಾಗಿದೆ. ದಯವಿಟ್ಟು ಸಂಬಳ, ದುಡ್ಡು, ಅಥವಾ ಶಿಫ್ಟ್ ಎಂಬ ಪದಗಳನ್ನು ಬಳಸಿ ಮತ್ತೊಮ್ಮೆ ಕೇಳಿ."
                 },
                 'hi-IN': {
                     wage: "वेजसिंक डेटाबेस रिकॉर्ड जांच सफल रही: आपकी मानक वेतन दर प्रति शिफ्ट सात सौ बीस रुपये निर्धारित की गई है।",
@@ -329,7 +354,7 @@
                 },
                 'te-IN': {
                     wage: "వేజ్‌సింక్ డేటాబేస్ రికార్డ్ తనిఖీ విజయవంతమైంది: మీ ప్రామాణిక వేతన రేటు ప్రతి షిఫ్ట్‌కు ఏడు వందల ఇరవై రూపాయలుగా ధృవీకరించబడింది.",
-                    shift: "మీ షిఫ్ట్ వివరాలు సురక్షితంగా ఉన్నాయి. మీ జిపిఎస్ లొకేషన్ బొమ్మసంద్ర ఇండస్ట్రియల్ ఏరియాతో సరిపోలింది.",
+                    shift: "మీ షిఫ్ట్ వివరాలు సురಕ್ಷితంగా ఉన్నాయి. మీ జిపిఎస్ లొకేషన్ బొమ్మసంద్ర ఇండస్ట్రియల్ ఏరియాతో సరిపోలింది.",
                     fallback: "దయచేసి జీతం, డబ్బులు లేదా షిఫ్ట్ వంటి పదాలను ఉపయోగించి మరోసారి అడగండి."
                 }
             };
@@ -347,7 +372,7 @@
             const isShiftQuery = checkText.includes('overtime') || checkText.includes('ot') || checkText.includes('shift') || 
                                 checkText.includes('attendance') || checkText.includes('hours') || checkText.includes('check') || 
                                 checkText.includes('punch') || checkText.includes('ಹಾಜರಾತಿ') || checkText.includes('حضور') || 
-                                checkText.includes('வருகை') || checkText.includes('ಹಾజరు') || checkText.includes('ಷೆಡ್ಯೂಲ್');
+                                checkText.includes('வருகை') || checkText.includes('ಹಾಜರು') || checkText.includes('ಷೆಡ್ಯೂಲ್');
 
             if (isWageQuery) {
                 chosenTextResponse = currentDataset.wage;
